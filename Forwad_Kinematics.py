@@ -71,18 +71,17 @@ def matMultiplication(T1,T2,T3,T4,T5,T6,T7):
 if __name__ == '__main__':
     fig=plt.figure()
     ax = fig.add_subplot(111, projection='3d')
-    for q1 in range(-90,90,18):
-        for q2 in range(-90,90,18):
-            for q3 in range(-90,90,18):
-                for q4 in range(-90,90,18):
-                    T1,T2,T3,T4,T5,T6,T7=substitute(q1,q2,q3,q4,0,0,0)
-                    T1_7=matMultiplication(T1,T2,T3,T4,T5,T6,T7)
-                    #print(T1_7)
-                    x=T1_7[0,3]
-                    y=T1_7[1,3]
-                    z=T1_7[2,3]
-                    ax.scatter(x, y, z,c='r',marker='o')
+    for q1 in range(-180,180,10):
+        for q2 in range(-180,180,10):
+            T1,T2,T3,T4,T5,T6,T7=substitute(q1,q2,0,0,0,0,0)
+            T1_7=matMultiplication(T1,T2,T3,T4,T5,T6,T7)
+            #print(T1_7)
+            x=T1_7[0,3]
+            y=T1_7[1,3]
+            z=T1_7[2,3]
+            ax.scatter(x, y, z,c='r',marker='o')
 
+    ax.view_init(elev=0,azim=0)
     ax.set_xlabel('X Label')
     ax.set_ylabel('Y Label')
     ax.set_zlabel('Z Label')
