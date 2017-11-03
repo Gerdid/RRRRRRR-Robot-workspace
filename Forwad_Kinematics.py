@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Nov  3 12:46:51 2017
+
+@author: gerha
+"""
 import sympy as sym #
 import numpy as np  # Libraries import
 import math as math        #
@@ -6,84 +12,65 @@ import matplotlib.pyplot as plt
 
 pi=math.pi
 
-
-dof=7;#7 Degrees of freedom
+dof=7;
 
 q1,q2,q3,q4,q5,q6,q7=sym.symbols('q1,q2,q3,q4,q5,q6,q7')    #joint variable as symbolic
-theta=[q1,q2,q3,q4,q5,q6,q7]                                #
-d=[0,0,3,0,5,0,7]                                         # Denavit-Hartenberg parameters definition
-alpha=[-pi/2,pi/2,-pi/2,pi/2,-pi/2,pi/2,0]                  #
-a=[0,0,0,0,0,0,0]                                           #
+d3=3
+d5=5
+d7=7
 
-
+#Robot dictionary
+robot=\
+{1:[q1,0,-pi/2,0],\
+ 2:[q2,0,pi/2,0],\
+ 3:[q3,d3,-pi/2,0],\
+ 4:[q4,0,pi/2,0],\
+ 5:[q5,d5,-pi/2,0],\
+ 6:[q6,0,pi/2,0],\
+ 7:[q7,d7,-pi/2,0],}
 
 def substitute(q1,q2,q3,q4,q5,q6,q7):
+    T=[]
+    q=[q1,q2,q3,q4,q5,q6,q7];
+    for i in range(0,dof):
+        currentJoint=robot.get(i+1)
+        currentJoint[0]=q[i]
+        #currentJoint[0]=0
+        mat=np.array([[math.cos(currentJoint[0]),-math.sin(currentJoint[0])*math.cos(currentJoint[2]),math.sin(currentJoint[0])*math.sin(currentJoint[2]),currentJoint[3]*math.cos(currentJoint[0])],\
+                            [math.sin(currentJoint[0]),math.cos(currentJoint[0])*math.cos(currentJoint[2]),-math.cos(currentJoint[0])*math.sin(currentJoint[2]),currentJoint[2]*math.sin(currentJoint[0])],\
+                            [0,math.sin(currentJoint[2]),math.cos(currentJoint[2]),currentJoint[1]],\
+                            [0,0,0,1]])
+        T.append(mat)
+    return T
 
-    T1=np.array([[math.cos(q1),-math.sin(q1)*math.cos(alpha[0]),math.sin(q1)*math.sin(alpha[0]),a[0]*math.cos(q1)],\
-    [math.sin(q1),math.cos(q1)*math.cos(alpha[0]),-math.cos(q1)*math.sin(alpha[0]),alpha[0]*math.sin(q1)],\
-    [0,math.sin(alpha[0]),math.cos(alpha[0]),d[0]],\
-    [0,0,0,1]])
-
-
-    T2=np.array([[math.cos(q2),-math.sin(q2)*math.cos(alpha[1]),math.sin(q2)*math.sin(alpha[1]),a[1]*math.cos(q2)],\
-    [math.sin(q2),math.cos(q2)*math.cos(alpha[1]),-math.cos(q2)*math.sin(alpha[1]),alpha[1]*math.sin(q2)],\
-    [0,math.sin(alpha[1]),math.cos(alpha[1]),d[1]],\
-    [0,0,0,1]])
-
-
-    T3=np.array([[math.cos(q3),-math.sin(q3)*math.cos(alpha[2]),math.sin(q3)*math.sin(alpha[2]),a[2]*math.cos(q3)],\
-    [math.sin(q3),math.cos(q3)*math.cos(alpha[2]),-math.cos(q3)*math.sin(alpha[2]),alpha[2]*math.sin(q3)],\
-    [0,math.sin(alpha[2]),math.cos(alpha[2]),d[2]],\
-    [0,0,0,1]])
-
-
-    T4=np.array([[math.cos(q4),-math.sin(q4)*math.cos(alpha[3]),math.sin(q4)*math.sin(alpha[3]),a[3]*math.cos(q4)],\
-    [math.sin(q4),math.cos(q4)*math.cos(alpha[3]),-math.cos(q4)*math.sin(alpha[3]),alpha[3]*math.sin(q4)],\
-    [0,math.sin(alpha[3]),math.cos(alpha[3]),d[3]],\
-    [0,0,0,1]])
-
-    T5=np.array([[math.cos(q5),-math.sin(q5)*math.cos(alpha[4]),math.sin(q5)*math.sin(alpha[4]),a[4]*math.cos(q5)],\
-    [math.sin(q5),math.cos(q5)*math.cos(alpha[4]),-math.cos(q5)*math.sin(alpha[4]),alpha[4]*math.sin(q5)],\
-    [0,math.sin(alpha[4]),math.cos(alpha[4]),d[4]],\
-    [0,0,0,1]])
-
-    T6=np.array([[math.cos(q6),-math.sin(q6)*math.cos(alpha[5]),math.sin(q6)*math.sin(alpha[5]),a[5]*math.cos(q6)],\
-    [math.sin(q6),math.cos(q6)*math.cos(alpha[5]),-math.cos(q6)*math.sin(alpha[5]),alpha[5]*math.sin(q6)],\
-    [0,math.sin(alpha[5]),math.cos(alpha[5]),d[5]],\
-    [0,0,0,1]])
-
-    T7=np.array([[math.cos(q7),-math.sin(q7)*math.cos(alpha[6]),math.sin(q7)*math.sin(alpha[6]),a[6]*math.cos(q7)],\
-    [math.sin(q7),math.cos(q7)*math.cos(alpha[6]),-math.cos(q7)*math.sin(alpha[6]),alpha[6]*math.sin(q7)],\
-    [0,math.sin(alpha[6]),math.cos(alpha[6]),d[6]],\
-    [0,0,0,1]])
-
-    return T1,T2,T3,T4,T5,T6,T7;
-
-def matMultiplication(T1,T2,T3,T4,T5,T6,T7):
-    T1_2=np.dot(T1,T2)
-    T1_3=np.dot(T1_2,T3);
-    T1_4=np.dot(T1_3,T4);
-    T1_5=np.dot(T1_4,T5);
-    T1_6=np.dot(T1_5,T6);
-    T1_7=np.dot(T1_6,T7);
-    return T1_7;
-
+def matMultiplication(T):
+    for i in range(1,dof):
+        if i==1:
+            matMult=np.dot(T[i-1],T[i])
+        else:
+            matMult=np.dot(matMult,T[i])
+    return matMult    
+    
+    
 if __name__ == '__main__':
     fig=plt.figure()
     ax = fig.add_subplot(111, projection='3d')
-    for q1 in range(-180,180,10):
-        for q2 in range(-180,180,10):
-            T1,T2,T3,T4,T5,T6,T7=substitute(q1,q2,0,0,0,0,0)
-            T1_7=matMultiplication(T1,T2,T3,T4,T5,T6,T7)
-            #print(T1_7)
-            x=T1_7[0,3]
-            y=T1_7[1,3]
-            z=T1_7[2,3]
-            ax.scatter(x, y, z,c='r',marker='o')
+    for q1 in range(-180,180,1):
+        for q2 in range(-180,180,1):
+                T=substitute(q1,q2,0,0,0,0,0)
+                T1_7=matMultiplication(T)
+                x=T1_7[0,3]
+                y=T1_7[1,3]
+                z=T1_7[2,3]
+                ax.scatter(x, y, z,c='r',marker='o')
 
-    ax.view_init(elev=0,azim=0)
     ax.set_xlabel('X Label')
     ax.set_ylabel('Y Label')
     ax.set_zlabel('Z Label')
-
+            
     plt.show()
+    T=substitute(0,0,0,0,0,0,0)
+    T1_7=matMultiplication(T)
+    print(len(T))
+    print(T1_7)
+    print(T)
