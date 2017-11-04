@@ -9,7 +9,6 @@ import numpy as np                      #
 import math as math                     #Libraries import
 from mpl_toolkits.mplot3d import Axes3D #
 import matplotlib.pyplot as plt         #
-from matplotlib import colors as mcolors#
 
 #---Constants definition---#
 pi=math.pi
