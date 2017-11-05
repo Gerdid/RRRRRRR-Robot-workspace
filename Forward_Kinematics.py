@@ -70,7 +70,7 @@ if __name__ == '__main__':
             x=T1_7[0,3]
             y=T1_7[1,3]
             z=T1_7[2,3]
-            ax.scatter(x, y, z,c='#FFA500',marker='o')
+            ax.scatter(x, y, z,c='orange',marker='o')
 
     #ax.view_init(elev=90,azim=0)
     ax.set_xlabel('X')
