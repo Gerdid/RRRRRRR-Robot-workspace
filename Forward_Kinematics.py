@@ -19,7 +19,7 @@ d5=5        #Distance between joints (depending on desing)
 d7=7        #
 minAngle=-90    #Minimum reacheale angle by the joint
 maxAngle=91     #Maximum reachable angle by the joint
-stepSize=5      #Degrees between each joint movement
+stepSize=10      #Degrees between each joint movement
 
 
 #Robot dictionary
@@ -59,21 +59,62 @@ def matrixMultiplication(T):
     return temp;
 
 if __name__ == '__main__':
+
+    #-----Workspace-----#
+
     fig=plt.figure()
+    fig.suptitle('WORKSPACE')
+
+
     ax = fig.add_subplot(111, projection='3d')
-    #Only first to joint variables neccesary for maximum robot workspace
+
+
+    #Only first two joint variables neccesary for maximum robot workspace
     for q1 in range(minAngle,maxAngle,stepSize):
         for q2 in range(minAngle,maxAngle,stepSize):
             T=substitute(q1,q2,0,0,0,0,0)
-            T1_7=matrixMultiplication(T)
+            T0_7=matrixMultiplication(T)
             #Obtain the translation vector from the transformation matrix
-            x=T1_7[0,3]
-            y=T1_7[1,3]
-            z=T1_7[2,3]
+            x=T0_7[0,3]
+            y=T0_7[1,3]
+            z=T0_7[2,3]
+
             ax.scatter(x, y, z,c='orange',marker='o')
 
-    #ax.view_init(elev=90,azim=0)
+
+    #Graph workspace
     ax.set_xlabel('X')
     ax.set_ylabel('Y')
     ax.set_zlabel('Z')
+
+
+    #-----Orientation-----#
+    figRot=plt.figure()
+    figRot.suptitle('END EFFECTOR ORIENTATION')
+
+    rot= figRot.add_subplot(111)
+
+    #Q7 is redundant so it is not considered
+    for q4 in range(minAngle,maxAngle,stepSize):
+        for q5 in range(minAngle,maxAngle,stepSize):
+            for q6 in range(minAngle,maxAngle,stepSize):
+                T=substitute(0,0,0,q4,q5,q6,0)
+                T0_7=matrixMultiplication(T)
+                #From the transformation matrix obtain the 3x3 rotation matrix
+                T_Rot=np.array([[T0_7[0,0],T0_7[0,1],T0_7[0,2]],\
+                                [T0_7[1,0],T0_7[1,1],T0_7[1,2]],
+                                [T0_7[2,0],T0_7[2,1],T0_7[2,2]]])
+                #Multiply rotation matrix by a unitary vector
+                xyz_Rot=np.dot(T_Rot,np.array([[1/math.sqrt(3)],[1/math.sqrt(3)],[1/math.sqrt(3)]]))
+                x_Rot=xyz_Rot[0];   #x is the first element from the previous routine
+                y_Rot=xyz_Rot[1];   #y is the second element
+                z_Rot=xyz_Rot[2];   #z is the third element
+
+                rot.scatter(x_Rot, y_Rot,c='coral',marker='o',s=1)
+
+    #Graph rotation
+    rot.set_xlabel('X')
+    rot.set_ylabel('Y')
+    #rot.set_zlabel('Z')
+
     plt.show()
